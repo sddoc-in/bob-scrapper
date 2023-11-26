@@ -31,8 +31,8 @@ def getdata(page,querry):
     }
 
     params = {
-        'page': '1',
-        'searchtext': 'earphones',
+        'page': str(page),
+        'searchtext': querry,
         'view': 'list',
         '_c': 'xhr',
         # 'bltgc': 'oMbHe-J-BF28K2tWBahEpg',
