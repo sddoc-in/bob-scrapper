@@ -7,9 +7,31 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     htmlindex = """
-    <h1> Welcome to Bol.com Scraper </h1>
-    <p> Please use the following URL to get the data: </p>
-    <p> /getdata?page=1&querry=charger </p>
+   <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Bol.com Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mt-8 mb-6">Welcome Bob to the Bol.com Scraper</h1>
+
+        <div class="flex justify-center">
+            <a href="/getdata?page=1&querry=charger"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Get Data
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
+
     """
 
     return htmlindex 
