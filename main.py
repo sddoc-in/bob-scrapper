@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 import requests, re
 from flask import Flask,request, jsonify
-
+from flask_cors import CORS
 app = Flask(__name__)
+cors = CORS(app, resources={r"/": {"origins": "https://uibob.sddoc.in"}})
 
 @app.route('/')
 def index():
