@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "react-scripts start",
-    	"build": "react-scripts build",
+		"start": "webpack-dev-server",
+		"build": "webpack --config webpack.config.js --watch",
 		"tsc": "tsc --watch",
 		"prod-build": "webpack --config webpack.prod.config.js --mode production"
 	},
