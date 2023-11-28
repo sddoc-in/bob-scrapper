@@ -6,10 +6,10 @@ import axios from "axios";
 export default function FileTaker() {
 
 
-  const { setHeader,setFileData,setState} = React.useContext(ExcelContext);
+  const { setHeader, setFileData, setState,fileChoser } = React.useContext(ExcelContext);
 
 
-  const { setLoading, setCurrentProduct, currentProduct, currentPage ,setCurrentPage} = React.useContext(MainContext);
+  const { setLoading, setCurrentProduct,allProducts, setAllProducts, currentProduct, currentPage, setCurrentPage, themeObj, oppositeObj } = React.useContext(MainContext);
 
   const getQueryData = React.useRef(() => { });
 
@@ -20,7 +20,6 @@ export default function FileTaker() {
         return;
       }
       setLoading(true);
-      axios.defaults.timeout = 1000 * 60 * 10; // 10 minutes 
       let response = await fetch("https://bob.sddoc.in/getdata?" + new URLSearchParams({
         page: currentPage.toString(),
         querry: currentProduct
@@ -28,18 +27,21 @@ export default function FileTaker() {
         method: "GET",
       });
       let data = await response.json();
-      if(data.length === 0){
+      if (data.length === 0) {
         alert("No Data Found")
         return
       }
-      else{
-        setCurrentPage(currentPage+1);
-          // setting header
-          setHeader(Object.keys(data[0]))
-          // setting file data
-          setFileData(data)
-          // setting state
-          setState(1)
+      else {
+        setCurrentPage(currentPage + 1);
+        setHeader(Object.keys(data[0]))
+        let temp = []
+        for (let i = 0; i < data.length; i++) {
+          temp.push(Object.values(data[i]))
+        }
+        setFileData(temp)
+        setAllProducts([...allProducts, { product: currentProduct, page: currentPage }])
+        setState(1)
+
       }
     }
     catch (e) {
@@ -68,18 +70,19 @@ export default function FileTaker() {
     }
   }
   function getFile(e: any) {
-    // if (!checkFileTypes(e.ta)) {
-    //   alert("Only Excel and csv files are allowed");
-    //   return;
-    // }
-    console.log(e.target.files[0])
+    const file = e.target.files[0];
+    if (!checkFileTypes(file.type)) {
+      alert("Only Excel and csv files are allowed");
+      return;
+    }
+    fileChoser(file)
   }
 
   return (
     <>
       <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
 
-        <input type="text" className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3" placeholder="Enter Product" onChange={(e) => setCurrentProduct(e.target.value)} />
+        <input type="text" className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3" placeholder="Enter Product" style={oppositeObj} onChange={(e) => setCurrentProduct(e.target.value)} />
 
         <div className="flex justify-center items-center">
           <button
@@ -90,10 +93,10 @@ export default function FileTaker() {
           </button>
         </div>
 
-        <div className="divider w-full">OR</div>
+        <div className="divider w-full" style={themeObj}>OR</div>
         <input
           type="file"
-          className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white"
+          className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white" style={oppositeObj}
           onChange={(e) => getFile(e)}
         />
       </div>

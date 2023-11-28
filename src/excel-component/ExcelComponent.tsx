@@ -110,7 +110,7 @@ export default function ExcelComponent() {
     });
   }
 
-  const classes = " w-11/12 h-[80vh] mx-auto";
+  const classes = " w-[99%] h-[80vh] mx-auto";
   return (
     <>
       <div
@@ -151,9 +151,9 @@ export default function ExcelComponent() {
                       >
                         <label
                           tabIndex={index}
-                          className=" mx-2 w-[100px] block cursor-pointer overflow-hidden"
+                          className=" mx-2 w-[200px] block cursor-pointer overflow-hidden"
                         >
-                          {item.length > 10 ? item.slice(0, 10) + "..." : item}
+                          {item.length > 25 ? item.slice(0, 25) + "..." : item}
                         </label>
                         <FilterOpener
                           value={item}
@@ -174,7 +174,7 @@ export default function ExcelComponent() {
                         key={index}
                         autoFocus
                         type="text"
-                        className="w-[100px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                        className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
                         defaultValue={item}
                         onChange={(e) =>
                           setIsChanging({
@@ -220,7 +220,7 @@ export default function ExcelComponent() {
                         ) ? (
                           <div
                             key={valIndex}
-                            className={`w-[100px!important] text-start mx-2 overflow-hidden ${
+                            className={`w-[200px!important] text-start mx-2 overflow-hidden ${
                               columnsHidden.includes(valIndex)
                                 ? "hidden"
                                 : "block"
@@ -245,8 +245,8 @@ export default function ExcelComponent() {
                                 : rowItem
                               : "-"} */}
                               {
-                                rowItem.length > 10
-                                ? rowItem.slice(0, 10) + "..."
+                                rowItem.length > 25
+                                ? rowItem.slice(0, 25) + "..."
                                 : rowItem
                               }
                           </div>
@@ -254,7 +254,7 @@ export default function ExcelComponent() {
                           <input
                             key={valIndex}
                             type="text"
-                            className="w-[100px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                            className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
                             defaultValue={rowItem}
                             autoFocus
                             onChange={(e) =>
