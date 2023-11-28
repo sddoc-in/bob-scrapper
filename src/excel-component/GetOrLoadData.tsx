@@ -15,31 +15,30 @@ export default function GetOrLoadData() {
 
     const [selectOpen, setSelectOpen] = React.useState<any>({
         open: false,
-        data: allProducts,
     });
 
     function channgeProduct(e: any) {
         setNewProduct(e.target.value)
         setSelectOpen({ ...selectOpen, open: false })
-        setSelectedProduct({ })
+        setSelectedProduct({})
     }
 
     async function loadMoreData() {
-        if(!selectedProduct.product && !newProduct){
+        if (!selectedProduct.product && !newProduct) {
             alert("Please Select or Enter Product to load")
             return
         }
         let currentProduct = selectedProduct.product ? selectedProduct.product : newProduct
-        let currentPage = selectedProduct.page ? selectedProduct.page+1 : 1
+        let currentPage = selectedProduct.page ? selectedProduct.page + 1 : 1
 
 
         setLoading(true);
         let responses = await fetch("https://bob.sddoc.in/getdata?" + new URLSearchParams({
-                page: currentPage,
-                querry: currentProduct,
-            }), {
-                method: "GET",
-            });
+            page: currentPage,
+            querry: currentProduct,
+        }), {
+            method: "GET",
+        });
         let data = await responses.json();
         if (data.length === 0) {
             alert("No Data Found")
@@ -51,10 +50,12 @@ export default function GetOrLoadData() {
                 temp.push(Object.values(data[i]))
             }
 
+            let newProductList = [...allProducts, { product: currentProduct, page: currentPage }]
+            console.log(newProductList)
             setFileData(temp)
-            console.log(temp)
-            setAllProducts([...allProducts, { product: currentProduct, page: currentPage}])
-            setSelectedProduct({ product: currentProduct, page: currentPage})
+            setAllProducts(newProductList)
+            setSelectOpen({  open: false })
+            setSelectedProduct({ product: currentProduct, page: currentPage })
             setCurrentProduct(currentProduct)
             setCurrentPage(currentPage)
         }
@@ -81,13 +82,13 @@ export default function GetOrLoadData() {
             </div>
             {selectOpen.open && (
                 <div className="w-full max-w-xs mt-1 mb-3 text-start max-h-[400px] bg-white shadow-lg">
-                    {selectOpen.data.length > 0 ? (
-                        selectOpen.data.map((item: any, idx: number) => (
+                    {allProducts.length > 0 ? (
+                        allProducts.map((item: any, idx: number) => (
                             <p
                                 key={idx}
                                 onClick={() => {
                                     setSelectedProduct(item)
-                                    setSelectOpen({ ...selectOpen, open: false });
+                                    setSelectOpen({ open: false });
                                 }}
                                 className="text-black text-[18px] py-2 pl-2 cursor-pointer"
                             >
