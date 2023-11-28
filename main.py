@@ -62,7 +62,7 @@ def getdata(page,querry):
 
     response = requests.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers)
 
-    Soup = BeautifulSoup(response.text, 'html')
+    Soup = BeautifulSoup(response.text, 'html.parser')
     ALLproduct =  Soup.find_all('div', {'data-test': 'product-content'})
 
     product_details_list = []
@@ -73,17 +73,18 @@ def getdata(page,querry):
         except:
             print(productName)
             continue
-        responsePartner= requests.get(productUrl)
-        partnerSoup = BeautifulSoup(responsePartner.text, 'html')
-        target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
+        # responsePartner= requests.get(productUrl)
+        # partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
+        # target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
+        # try:
+        #     NumOfpartners = target_div.text.strip()
+        # except:
+        #     NumOfpartners = "not have"
+        NumOfpartners = "not have"
         try:
             originalPrice = data.find('del', class_= 'h-nowrap').text
         except:
             originalPrice="it is already on original price"
-        try:
-            NumOfpartners = target_div.text.strip()
-        except:
-            NumOfpartners = "not have"
         
         brandName = data.find('ul', class_= 'product-creator').text
         star_rating_div = data.find('div', class_='star-rating')
