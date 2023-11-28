@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+
+.collapse:not(.show) {
+    display: inline-grid;
+  }
+  
+  #left-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  
+  #scroll-hide::-webkit-scrollbar {
+    width: 10px !important;
+    position: absolute!important;
+    height: 10px !important;
+  }
+  
+  #scroll-hide::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }

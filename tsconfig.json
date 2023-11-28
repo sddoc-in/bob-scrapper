@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "noEmitOnError": true,
+        "module": "commonjs",
+        "removeComments": false,
+        "sourceMap": true,
+        "target": "ES6",
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+    },
+    "include": [
+        "./src/**/*",
+        "src/**/*.css",
+    ]
+}
