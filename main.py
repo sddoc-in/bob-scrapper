@@ -73,14 +73,13 @@ def getdata(page,querry):
         except:
             print(productName)
             continue
-        # responsePartner= requests.get(productUrl)
-        # partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
-        # target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
-        # try:
-        #     NumOfpartners = target_div.text.strip()
-        # except:
-        #     NumOfpartners = "not have"
-        NumOfpartners = "not have"
+        responsePartner= requests.get(productUrl)
+        partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
+        target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
+        try:
+            NumOfpartners = target_div.text.strip()
+        except:
+            NumOfpartners = "not have" # if there is no partners
         try:
             originalPrice = data.find('del', class_= 'h-nowrap').text
         except:
