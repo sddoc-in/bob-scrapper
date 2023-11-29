@@ -2,6 +2,7 @@ import React from "react";
 import { ExcelContext } from "../context/ExcelContext";
 import { MainContext } from "../context/Context";
 import axios from "axios";
+import { BASE_API_URL } from "../constant/data";
 
 export default function FileTaker() {
 
@@ -20,12 +21,13 @@ export default function FileTaker() {
         return;
       }
       setLoading(true);
-      let response = await fetch("https://bob.sddoc.in/getdata?" + new URLSearchParams({
+      let response = await fetch(BASE_API_URL + new URLSearchParams({
         page: currentPage.toString(),
         querry: currentProduct
       }), {
         method: "GET",
       });
+      console.log(response)
       let data = await response.json();
       if (data.length === 0) {
         alert("No Data Found")

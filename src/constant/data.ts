@@ -1,1 +1,1 @@
-export const BASE_API_URL = "https://bob.sddoc.in/getdata";
+export const BASE_API_URL = "https://bob.sddoc.in/getdata?";

@@ -5,6 +5,7 @@ import {
     IoIosArrowDropdownCircle,
     IoIosArrowDropupCircle,
 } from "react-icons/io";
+import { BASE_API_URL } from '../constant/data';
 
 
 export default function GetOrLoadData() {
@@ -33,7 +34,7 @@ export default function GetOrLoadData() {
 
 
         setLoading(true);
-        let responses = await fetch("https://bob.sddoc.in/getdata?" + new URLSearchParams({
+        let responses = await fetch(BASE_API_URL + new URLSearchParams({
             page: currentPage,
             querry: currentProduct,
         }), {
@@ -50,7 +51,17 @@ export default function GetOrLoadData() {
                 temp.push(Object.values(data[i]))
             }
 
-            let newProductList = [...allProducts, { product: currentProduct, page: currentPage }]
+            let newProductList = allProducts
+            let currentProductList = allProducts.filter((item: any) => item.product === currentProduct)
+            if (currentProductList.length > 0) {
+                newProductList = allProducts.map((item: any) => {
+                    if (item.product === currentProduct) {
+                        item.page = currentPage
+                    }
+                    return item
+                })
+            }
+
             console.log(newProductList)
             setFileData(temp)
             setAllProducts(newProductList)
