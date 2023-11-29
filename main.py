@@ -3,7 +3,7 @@ import requests, re
 from flask import Flask,request, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
-cors = CORS(app, resources={r"/": {"origins": "https://uibob.sddoc.in"}})
+cors = CORS(app, origins=["https://uibob.sddoc.in", "http://localhost:3000"])
 
 @app.route('/')
 def index():
