@@ -74,13 +74,14 @@ def getdata(page,querry):
         except:
             print(productName)
             continue
-        responsePartner= requests.get(productUrl)
-        partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
-        target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
-        try:
-            NumOfpartners = target_div.text.strip()
-        except:
-            NumOfpartners = "not have" # if there is no partners
+        # responsePartner= requests.get(productUrl)
+        # partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
+        # target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
+        # try:
+        #     NumOfpartners = target_div.text.strip()
+        # except:
+        #     NumOfpartners = "not have" # if there is no partners
+        NumOfpartners = "not have" # if there is no partners
         try:
             originalPrice = data.find('del', class_= 'h-nowrap').text
         except:
@@ -91,6 +92,8 @@ def getdata(page,querry):
         try:
             data_count_value = star_rating_div.get('data-count')
             title_value = star_rating_div.get('title')
+            title_value = re.search(r'(\d+(?:,\d+)?)', title_value).group(1)
+
         except:
             data_count_value=0
             title_value= "no reviews"
@@ -107,19 +110,20 @@ def getdata(page,querry):
             price = data.find('span', class_='promo-price').text
             price= price.replace("\n", "")
         except:
-            print(price)
+            # print(price)
+            pass
         brandName = brandName.replace("\n","")
         try:
             product_details = {
-                'product Url': productUrl,
                 'Brand Name': brandName,
                 'Product Name': productName.text,
                 'Price': price,
-                'Real Price': originalPrice,
-                'Total Reviews': data_count_value,
+                'Partners': NumOfpartners,
                 'Rating': title_value,
+                'product Url': productUrl,
+                'Total Reviews': data_count_value,
                 'Delivery Time': delivery_time_text,
-                'Partners': NumOfpartners
+                'Real Price': originalPrice,
             }
             
             product_details_list.append(product_details)
