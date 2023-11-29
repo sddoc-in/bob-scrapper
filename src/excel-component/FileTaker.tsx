@@ -18,26 +18,31 @@ export default function FileTaker() {
         return;
       }
       setLoading(true);
-      const maxPages = 4; 
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-      let reqdata = [];
+      const maxPages = 4;
+      const retryAttempts = 3; // Number of retry attempts 
+      var reqdata = [];
       for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
-        await delay(Math.random() * 2000); 
-
-        try {
-            const response = await fetch(`${BASE_API_URL}?` + new URLSearchParams({
-                page: currentPage.toString(),
-                query: currentProduct 
-            }), {
-                method: "GET",
-            });
-    
-            const resultdata = await response.json();
-            reqdata = reqdata.concat(resultdata); 
-        } catch (error) {
-            console.error('Error fetching data:', error);
+        let retryCount = 0;
+        let success = false;
+        while (retryCount < retryAttempts && !success) {
+        let response = await fetch(`${BASE_API_URL}?` + new URLSearchParams({
+          page: currentPage.toString(),
+          querry: currentProduct
+        }), {
+          method: "GET",
+        }) ;
+        
+        const responsedata = await response.json();
+        if (responsedata?.length) {
+          reqdata = [...reqdata, ...responsedata];
+          // reqdata.push(responsedata);
+          success = true; // Set success flag to true
+        } else {
+          retryCount++;
         }
+      }
+
+        
     }
 
 
@@ -65,30 +70,39 @@ export default function FileTaker() {
         setFileData(tempdata)
         setAllProducts([...allProducts, { product: currentProduct, page: currentPage }])
         setState(1)
+
+
         var data=[]
+        const retryAttempts = 3; // Number of retry attempts 
         const corsProxy = 'https://corsproxy.io/?';
-        var flag = 0
         for (let i = 0; i < reqdata.length; i++) {
+          let retryCount = 0;
+          let success = false;
+          while (retryCount < retryAttempts && !success){
           
+          try {
+
           const response = await fetch(corsProxy + encodeURIComponent( reqdata[i]['product Url']));
 
           const html = await response.text();
           const numOfPartners = GetNumberOfPartners(html)
           console.log(numOfPartners)
+          success = true;
           data.push({ ...reqdata[i], 'Partners': numOfPartners })
           reqdata[i].id = i + 1
-          await delay(Math.random() * 1000); 
-          if (flag > 25)
-          {
-            flag = 0
-            await delay(Math.random() * 3000); 
+            
+          } catch  {
+            console.log(retryCount,'anohther proxy retrying for cors eror fixing......')
+            retryCount++;
+            
           }
-          else
-          {
-            flag = flag + 1
+          
+
           }
         }
-        console.log({data})
+
+        
+      
         setCurrentPage(currentPage + 1);
         setHeader(Object.keys(data[0]))
         let temp = []
@@ -106,7 +120,7 @@ export default function FileTaker() {
       alert("Something went wrong")
     }
 
-    // setLoading(false);
+    // setLoading( false);
   };
 
   function checkFileTypes(file: string) {
