@@ -6,7 +6,7 @@ import {
     IoIosArrowDropupCircle,
 } from "react-icons/io";
 import { BASE_API_URL } from '../constant/data';
-import cheerio from 'cheerio';
+import GetNumberOfPartners from '../constant/GetPartener';
 
 export default function GetOrLoadData() {
     const { allProducts, setAllProducts, setCurrentProduct, setCurrentPage, themeObj, oppositeObj, setLoading } = React.useContext(MainContext)
@@ -50,17 +50,19 @@ export default function GetOrLoadData() {
 
             var data=[]
 
-        for (let i = 0; i < reqdata.length; i++) {
-          const response = await fetch(reqdata[i]['product Url'])
-          const html = await response.text();
-          const $ = cheerio.load(html);
+            const corsProxy = 'https://corsproxy.io/?';
+
+            for (let i = 0; i < reqdata.length; i++) {
     
-          const numOfPartnersElement = $('.buy-block__alternative-sellers-card__title:contains("partners")');
-          const numOfPartners = numOfPartnersElement.text().trim() || 'not have';
-          // console.log(numOfPartners)
-          data.push({ ...reqdata[i], 'Partners': numOfPartners })
-          reqdata[i].id = i + 1
-        }
+              // const response = await fetch(reqdata[i]['product Url'])
+              const response = await fetch(corsProxy + encodeURIComponent( reqdata[i]['product Url']));
+    
+              const html = await response.text();
+              const numOfPartners = GetNumberOfPartners(html)
+              // console.log(numOfPartners)
+              data.push({ ...reqdata[i], 'Partners': numOfPartners })
+              reqdata[i].id = i + 1
+            }
         console.log({data})
             let temp = fileData
             for (let i = 0; i < data.length; i++) {
