@@ -15,7 +15,9 @@ export default function DropDown({ filterType, setFilterType }: any) {
     'is not',
     "matches regex",
     "does not match regex",
-    "matches"
+    "matches",
+    "Ascending",
+    "Descending",
   ];
 
   return (

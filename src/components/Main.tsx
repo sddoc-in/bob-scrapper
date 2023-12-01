@@ -26,15 +26,7 @@ export default function Main() {
     const { state } = React.useContext(ExcelContext)
     return (
         <>
-            <div className='w-[100%] min-h-[100vh] flex justify-center items-center' style={
-                theme === 'light' ? {
-                    background: '#fff!important',
-                    color: '#000!important'
-                } : {
-                    background: '#000!important',
-                    color: '#fff!important'
-                }
-            }>
+            <div className={`w-[100%] min-h-[100vh] flex justify-center items-center ${themeObj}`}>
                 <div className='absolute top-1 left-1'>
                     <label className="swap swap-rotate">
 

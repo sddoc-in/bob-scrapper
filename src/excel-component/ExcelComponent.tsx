@@ -16,7 +16,7 @@ export default function ExcelComponent() {
     setColumnsHidden,
   } = React.useContext(ExcelContext);
 
-  const { setLoading } = React.useContext(MainContext);
+  const { setLoading,themeObj } = React.useContext(MainContext);
 
   const [data, setData] = React.useState<any>(fileData);
   const [search, setSearch] = React.useState<string>("");
@@ -34,15 +34,17 @@ export default function ExcelComponent() {
 
   function filterData(where: number) {
     setLoading(true);
-    const newData = data.filter((item: any, index: number) => {
+    let newData = data;
+    if(search !== ""){
+    newData = data.filter((item: any, index: number) => {
       if (filterType === "begins with")
-        return item[where].toString().toLowerCase().startsWith(search);
+        return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
       if (filterType === "ends with")
-        return item[where].toString().toLowerCase().endsWith(search);
+        return item[where].toString().toLowerCase().endsWith(search.toLowerCase());
       if (filterType === "contains")
-        return item[where].toString().toLowerCase().includes(search);
+        return item[where].toString().toLowerCase().includes(search.toLowerCase());
       if (filterType === "does not contain")
-        return !item[where].toString().toLowerCase().includes(search);
+        return !item[where].toString().toLowerCase().includes(search.toLowerCase());
       if (filterType === "equals")
         return item[where].toString().toLowerCase() === search.toLowerCase();
       if (filterType === "does not equal")
@@ -54,9 +56,25 @@ export default function ExcelComponent() {
       if (filterType === "does not match regex")
         return !item[where].toString().toLowerCase().match(search);
       if (filterType === "matches")
-        return item[where].toString().toLowerCase().match(search);
-      return item[where].toString().toLowerCase().startsWith(search);
+        return item[where].toString().toLowerCase().match(search.toLowerCase());
+      return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
     });
+  }
+    // sorting array of arrays
+    if (filterType === "Ascending") {
+      newData.sort(function (a: any, b: any) {
+        const priceA = a[where].toLowerCase();
+        const priceB = b[where].toLowerCase();
+        return priceA.localeCompare(priceB);
+      });
+    }
+    if (filterType === "Descending") {
+      newData.sort(function (a: any, b: any) {
+        const priceA = a[where].toLowerCase();
+        const priceB = b[where].toLowerCase();
+        return priceB.localeCompare(priceA);
+      });
+    }
     setFilterRecord([...filterRecord, { where: newData }]);
     setData(newData);
     setSearch("");
@@ -151,9 +169,9 @@ export default function ExcelComponent() {
                       >
                         <label
                           tabIndex={index}
-                          className=" mx-2 w-[200px] block cursor-pointer overflow-hidden"
+                          className=" mx-2 w-[150px] block cursor-pointer overflow-hidden"
                         >
-                          {item.length > 25 ? item.slice(0, 25) + "..." : item}
+                          {item.length > 10 ? item.slice(0, 10) + "..." : item}
                         </label>
                         <FilterOpener
                           value={item}
@@ -174,7 +192,7 @@ export default function ExcelComponent() {
                         key={index}
                         autoFocus
                         type="text"
-                        className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                        className="w-[150px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
                         defaultValue={item}
                         onChange={(e) =>
                           setIsChanging({
@@ -194,7 +212,7 @@ export default function ExcelComponent() {
               return (
                 <div
                   key={rowIndex}
-                  className={`flex justify-start items-center   text-black mx-auto  border-b w-fit border-[#bebbb8] ${
+                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8] ${themeObj} ${
                     flag ? "bg-blue-200" : ""
                   }`}
                 >
@@ -220,12 +238,13 @@ export default function ExcelComponent() {
                         ) ? (
                           <div
                             key={valIndex}
-                            className={`w-[200px!important] text-start mx-2 overflow-hidden ${
+                            className={`w-[150px!important] text-start mx-2 overflow-hidden ${
                               columnsHidden.includes(valIndex)
                                 ? "hidden"
                                 : "block"
                             }`}
                             onClick={() => {
+                              if(valIndex === 7) return;
                               setIsChanging({
                                 status: true,
                                 columnIndex: valIndex,
@@ -235,18 +254,12 @@ export default function ExcelComponent() {
                               });
                             }}
                           >
-                            {/* {rowItem
-                              ? Array.isArray(rowItem)
-                                ? ""
-                                : typeof rowItem === "object"
-                                ? ""
-                                : rowItem.length > 10
+                          {
+                            valIndex === 7 ?
+                            <a href={rowItem} target="_blank" rel="noreferrer" className="text-blue-500  p-2 underline-none bg-[#0330fc] text-white rounded-sm">Link</a>
+                            :
+                                rowItem.length > 10
                                 ? rowItem.slice(0, 10) + "..."
-                                : rowItem
-                              : "-"} */}
-                              {
-                                rowItem.length > 25
-                                ? rowItem.slice(0, 25) + "..."
                                 : rowItem
                               }
                           </div>
@@ -254,7 +267,7 @@ export default function ExcelComponent() {
                           <input
                             key={valIndex}
                             type="text"
-                            className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                            className="w-[150px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
                             defaultValue={rowItem}
                             autoFocus
                             onChange={(e) =>

@@ -6,6 +6,7 @@ import {
     IoIosArrowDropupCircle,
 } from "react-icons/io";
 import { BASE_API_URL } from '../constant/data';
+import GetNumberOfPartners from './GetPartner';
 
 
 export default function GetOrLoadData() {
@@ -32,23 +33,41 @@ export default function GetOrLoadData() {
         let currentProduct = selectedProduct.product ? selectedProduct.product : newProduct
         let currentPage = selectedProduct.page ? selectedProduct.page + 1 : 1
 
+        let temp: any = []
+        if (fileData.length > 0) {
+            temp = fileData
+        }
+
+        let i = 0
 
         setLoading(true);
-        let responses = await fetch(BASE_API_URL + new URLSearchParams({
-            page: currentPage,
-            querry: currentProduct,
-        }), {
-            method: "GET",
-        });
-        let data = await responses.json();
-        if (data.length === 0) {
-            alert("No Data Found")
-            return
-        }
-        else {
-            let temp = fileData
-            for (let i = 0; i < data.length; i++) {
-                temp.push(Object.values(data[i]))
+        try {
+
+            for (i = 0; i < 4; i++) {
+                let response = await fetch(BASE_API_URL + new URLSearchParams({
+                    page: (currentPage + i).toString(),
+                    querry: currentProduct
+                }), {
+                    method: "GET",
+                    headers: {
+                        "Access-Control-Allow-Methods": '*',
+                        "Access-Control-Allow-Headers": '*',
+                        "Access-Control-Allow-Origin": '*',
+                    },
+                });
+                let data = await response.json();
+                if (data.length === 0) {
+                    // alert("No Data Found")
+                    //return
+                }
+                else {
+                    for (let j = 0; j < data.length; j++) {
+                        let tempObj: any = Object.values(data[j])
+                        let partner = await GetNumberOfPartners(tempObj[7])
+                        tempObj.push(partner)
+                        temp.push(tempObj)
+                    }
+                }
             }
 
             let newProductList = allProducts
@@ -56,25 +75,30 @@ export default function GetOrLoadData() {
             if (currentProductList.length > 0) {
                 newProductList = allProducts.map((item: any) => {
                     if (item.product === currentProduct) {
-                        item.page = currentPage
+                        item.page = currentPage + i
                     }
                     return item
                 })
             }
 
-            console.log(newProductList)
             setFileData(temp)
             setAllProducts(newProductList)
-            setSelectOpen({  open: false })
-            setSelectedProduct({ product: currentProduct, page: currentPage })
+            setSelectOpen({ open: false })
+            setSelectedProduct({ product: currentProduct, page: currentPage + i })
             setCurrentProduct(currentProduct)
-            setCurrentPage(currentPage)
+            setCurrentPage(currentPage + i)
+
         }
+        catch (e) {
+            console.log(e)
+            alert("Something went wrong")
+        }
+
         setLoading(false);
     }
 
     return (
-        <div className='flex justify-center items-center flex-col my-4' style={themeObj}>
+        <div className='flex justify-center items-center flex-col my-4'>
 
 
             <div
@@ -83,12 +107,12 @@ export default function GetOrLoadData() {
                 }
                 className="flex justify-between cursor-pointer mt-3  pl-2 items-center  w-full max-w-xs "
             >
-                <input defaultValue={selectedProduct.product} placeholder="Select or Enter product" type="text" className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3" style={oppositeObj} onChange={channgeProduct} />
+                <input defaultValue={selectedProduct.product} placeholder="Select or Enter product" type="text" className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`} onChange={channgeProduct} />
 
                 {selectOpen.open ? (
-                    <IoIosArrowDropupCircle className="text-[30px] text-black cursor-pointer" />
+                    <IoIosArrowDropupCircle className={`text-[30px] text-black cursor-pointer ${themeObj}`} />
                 ) : (
-                    <IoIosArrowDropdownCircle className="text-[30px] text-black cursor-pointer" />
+                    <IoIosArrowDropdownCircle className={`text-[30px] text-black cursor-pointer ${themeObj}`} />
                 )}
             </div>
             {selectOpen.open && (
@@ -101,13 +125,13 @@ export default function GetOrLoadData() {
                                     setSelectedProduct(item)
                                     setSelectOpen({ open: false });
                                 }}
-                                className="text-black text-[18px] py-2 pl-2 cursor-pointer"
+                                className={`text-black text-[18px] py-2 pl-2 cursor-pointer ${oppositeObj}`}
                             >
                                 {item.product}
                             </p>
                         ))
                     ) : (
-                        <p className="text-black text-[18px] py-2 pl-2 cursor-pointer">
+                        <p className={`text-black text-[18px] py-2 pl-2 cursor-pointer ${oppositeObj}`}>
                             No Products selected yet.
                         </p>
                     )}

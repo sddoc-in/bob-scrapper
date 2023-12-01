@@ -18,22 +18,14 @@ export default function ContextProvider({ children }: any) {
     const [allProducts, setAllProducts] = React.useState<allProductsInterface[]>([])
     const [data, setData] = React.useState<any>([])
 
-    const lightTheme = {
-        background: '#fff!important',
-        color: '#000!important'
-    }
-    const darkTheme = {
-        background: '#000!important',
-        color: '#fff!important'
-    }
-
-    const themeObj = theme === 'light' ? lightTheme : darkTheme;
-    const oppositeObj = theme !== 'light' ? lightTheme : darkTheme;
+    
+    const themeObj = theme === 'light' ? 'light' : 'dark';
+    const oppositeObj = theme !== 'light' ? 'light' : 'dark';
 
 
     return (
         <MainContext.Provider value={{
-            theme, setTheme, lightTheme, darkTheme, loading, setLoading, themeObj,
+            theme, setTheme,  loading, setLoading, themeObj,
             currentPage, setCurrentPage, currentProduct, setCurrentProduct, oppositeObj,
             allProducts, setAllProducts, 
         }}>

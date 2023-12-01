@@ -2,15 +2,16 @@ import React from "react";
 import { ExcelContext } from "../context/ExcelContext";
 import { MainContext } from "../context/Context";
 import axios from "axios";
-import { BASE_API_URL } from "../constant/data";
+import { BASE_API_URL, PRODUCT_URL } from "../constant/data";
+import GetNumberOfPartners from "./GetPartner";
 
 export default function FileTaker() {
 
 
-  const { setHeader, setFileData, setState,fileChoser } = React.useContext(ExcelContext);
+  const { setHeader, setFileData, setState, fileChoser, fileData } = React.useContext(ExcelContext);
 
 
-  const { setLoading, setCurrentProduct,allProducts, setAllProducts, currentProduct, currentPage, setCurrentPage, themeObj, oppositeObj } = React.useContext(MainContext);
+  const { setLoading, setCurrentProduct, allProducts, setAllProducts, currentProduct, currentPage, setCurrentPage, themeObj, oppositeObj } = React.useContext(MainContext);
 
   const getQueryData = React.useRef(() => { });
 
@@ -20,38 +21,58 @@ export default function FileTaker() {
         alert("Enter Product");
         return;
       }
-      setLoading(true);
-      let response = await fetch(BASE_API_URL + new URLSearchParams({
-        page: currentPage.toString(),
-        querry: currentProduct
-      }), {
-        method: "GET",
-      });
-      console.log(response)
-      let data = await response.json();
-      if (data.length === 0) {
-        alert("No Data Found")
-        return
+      let temp: any = []
+      let header: any = []
+      if (fileData.length > 0) {
+        temp = fileData
       }
-      else {
-        setCurrentPage(currentPage + 1);
-        setHeader(Object.keys(data[0]))
-        let temp = []
-        for (let i = 0; i < data.length; i++) {
-          temp.push(Object.values(data[i]))
-        }
-        setFileData(temp)
-        setAllProducts([...allProducts, { product: currentProduct, page: currentPage }])
-        setState(1)
 
+      let i = 0
+      setLoading(true);
+
+      for (i = 0; i < 4; i++) {
+        let response = await fetch(BASE_API_URL + new URLSearchParams({
+          page: (currentPage + i).toString(),
+          querry: currentProduct
+        }), {
+          method: "GET",
+          headers: {
+            "Access-Control-Allow-Methods": '*',
+            "Access-Control-Allow-Headers": '*',
+            "Access-Control-Allow-Origin": '*',
+          },
+        });
+        let data = await response.json();
+        if (data.length === 0) {
+          // alert("No Data Found")
+          // return
+        }
+        else {
+          if (i === 0) {
+            header = Object.keys(data[0])
+            header.push("Partners")
+          }
+          for (let j = 0; j < data.length; j++) {
+            let tempObj: any = Object.values(data[j])
+            let partner = await GetNumberOfPartners(tempObj[PRODUCT_URL])
+            tempObj.push(partner)
+            temp.push(tempObj)
+          }
+        }
       }
+      setHeader(header)
+      setFileData(temp)
+      setAllProducts([...allProducts, { product: currentProduct, page: currentPage + i }])
+      setCurrentPage(currentPage + i);
+      setState(1)
+
     }
     catch (e) {
       console.log(e)
       alert("Something went wrong")
     }
-
     setLoading(false);
+
   };
 
   function checkFileTypes(file: string) {
@@ -84,7 +105,7 @@ export default function FileTaker() {
     <>
       <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
 
-        <input type="text" className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3" placeholder="Enter Product" style={oppositeObj} onChange={(e) => setCurrentProduct(e.target.value)} />
+        <input type="text" className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`} placeholder="Enter Product" onChange={(e) => setCurrentProduct(e.target.value)} />
 
         <div className="flex justify-center items-center">
           <button
@@ -95,10 +116,10 @@ export default function FileTaker() {
           </button>
         </div>
 
-        <div className="divider w-full" style={themeObj}>OR</div>
+        <div className="divider w-full" >OR</div>
         <input
           type="file"
-          className="file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white" style={oppositeObj}
+          className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white ${oppositeObj}`}
           onChange={(e) => getFile(e)}
         />
       </div>

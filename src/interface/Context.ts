@@ -11,10 +11,8 @@ export interface FileDetails {
 export default interface HappyClientMainContextInterface {
     theme: string,
     setTheme: React.Dispatch<React.SetStateAction<string>>,
-    lightTheme: object,
-    darkTheme: object,
-    themeObj: object,
-    oppositeObj: object,
+    themeObj: string,
+    oppositeObj: string,
     allProducts: object[],
     setAllProducts: React.Dispatch<React.SetStateAction<object[]>>,
     loading: boolean,
