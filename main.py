@@ -3,7 +3,7 @@ import requests, re
 from flask import Flask,request, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
-cors = CORS(app, origins=["https://uibob.sddoc.in", "http://localhost:3000", "https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev"])
+cors = CORS(app, origins=["https://uibob.sddoc.in", "http://localhost:3000","http://localhost:3000/" ,"https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev", "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev"])
 
 @app.route('/')
 def index():
@@ -81,7 +81,7 @@ def getdata(page,querry):
         #     NumOfpartners = target_div.text.strip()
         # except:
         #     NumOfpartners = "not have" # if there is no partners
-        NumOfpartners = "not have" # if there is no partners
+        # NumOfpartners = "not have" # if there is no partners/
         try:
             originalPrice = data.find('del', class_= 'h-nowrap').text
         except:
@@ -118,7 +118,6 @@ def getdata(page,querry):
                 'Brand Name': brandName,
                 'Product Name': productName.text,
                 'Price': price,
-                'Partners': NumOfpartners,
                 'Rating': title_value,
                 'product Url': productUrl,
                 'Total Reviews': data_count_value,
@@ -139,4 +138,4 @@ def getdata1():
     return jsonify (getdata(page,querry))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run()
