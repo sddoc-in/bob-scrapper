@@ -4,6 +4,7 @@ import FilterOpener from "./FilterOpener";
 import { HiddenColumns } from "./HiddenColumns";
 import { ExcelContext } from "../context/ExcelContext";
 import { MainContext } from "../context/Context";
+import { PARTNERS, PRICE, RATING, TOTAL_REVIEW } from "../constant/data";
 
 export default function ExcelComponent() {
   const {
@@ -16,7 +17,7 @@ export default function ExcelComponent() {
     setColumnsHidden,
   } = React.useContext(ExcelContext);
 
-  const { setLoading,themeObj } = React.useContext(MainContext);
+  const { setLoading, themeObj } = React.useContext(MainContext);
 
   const [data, setData] = React.useState<any>(fileData);
   const [search, setSearch] = React.useState<string>("");
@@ -35,44 +36,58 @@ export default function ExcelComponent() {
   function filterData(where: number) {
     setLoading(true);
     let newData = data;
-    if(search !== ""){
-    newData = data.filter((item: any, index: number) => {
-      if (filterType === "begins with")
+    if (search !== "") {
+      newData = data.filter((item: any, index: number) => {
+        if (filterType === "begins with")
+          return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
+        if (filterType === "ends with")
+          return item[where].toString().toLowerCase().endsWith(search.toLowerCase());
+        if (filterType === "contains")
+          return item[where].toString().toLowerCase().includes(search.toLowerCase());
+        if (filterType === "does not contain")
+          return !item[where].toString().toLowerCase().includes(search.toLowerCase());
+        if (filterType === "equals")
+          return item[where].toString().toLowerCase() === search.toLowerCase();
+        if (filterType === "does not equal")
+          return item[where].toString().toLowerCase() !== search.toLowerCase();
+        if (filterType === "is not")
+          return item[where].toString().toLowerCase() !== search.toLowerCase();
+        if (filterType === "matches regex")
+          return item[where].toString().toLowerCase().match(search);
+        if (filterType === "does not match regex")
+          return !item[where].toString().toLowerCase().match(search);
+        if (filterType === "matches")
+          return item[where].toString().toLowerCase().match(search.toLowerCase());
         return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
-      if (filterType === "ends with")
-        return item[where].toString().toLowerCase().endsWith(search.toLowerCase());
-      if (filterType === "contains")
-        return item[where].toString().toLowerCase().includes(search.toLowerCase());
-      if (filterType === "does not contain")
-        return !item[where].toString().toLowerCase().includes(search.toLowerCase());
-      if (filterType === "equals")
-        return item[where].toString().toLowerCase() === search.toLowerCase();
-      if (filterType === "does not equal")
-        return item[where].toString().toLowerCase() !== search.toLowerCase();
-      if (filterType === "is not")
-        return item[where].toString().toLowerCase() !== search.toLowerCase();
-      if (filterType === "matches regex")
-        return item[where].toString().toLowerCase().match(search);
-      if (filterType === "does not match regex")
-        return !item[where].toString().toLowerCase().match(search);
-      if (filterType === "matches")
-        return item[where].toString().toLowerCase().match(search.toLowerCase());
-      return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
-    });
-  }
+      });
+    }
     // sorting array of arrays
     if (filterType === "Ascending") {
       newData.sort(function (a: any, b: any) {
-        const priceA = a[where].toLowerCase();
-        const priceB = b[where].toLowerCase();
-        return priceA.localeCompare(priceB);
+        if (where === RATING || where === PRICE || where === TOTAL_REVIEW || where === PARTNERS) {
+          const priceA = parseFloat(a[where])
+          const priceB = parseFloat(b[where])
+          return priceA - priceB
+        }
+        else {
+          const priceA = a[where].toLowerCase();
+          const priceB = b[where].toLowerCase();
+          return priceA.localeCompare(priceB);
+        }
       });
     }
     if (filterType === "Descending") {
       newData.sort(function (a: any, b: any) {
-        const priceA = a[where].toLowerCase();
-        const priceB = b[where].toLowerCase();
-        return priceB.localeCompare(priceA);
+        if (where === RATING || where === PRICE || where === TOTAL_REVIEW || where === PARTNERS) {
+          const priceA = parseFloat(a[where])
+          const priceB = parseFloat(b[where])
+          return priceB - priceA
+        }
+        else {
+          const priceA = a[where].toLowerCase();
+          const priceB = b[where].toLowerCase();
+          return priceB.localeCompare(priceA);
+        }
       });
     }
     setFilterRecord([...filterRecord, { where: newData }]);
@@ -162,9 +177,8 @@ export default function ExcelComponent() {
                       isChanging.header
                     ) ? (
                       <div
-                        className={`dropdown ${
-                          columnsHidden.includes(index) ? "hidden" : "block"
-                        }`}
+                        className={`dropdown ${columnsHidden.includes(index) ? "hidden" : "block"
+                          }`}
                         key={index}
                       >
                         <label
@@ -212,9 +226,8 @@ export default function ExcelComponent() {
               return (
                 <div
                   key={rowIndex}
-                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8] ${themeObj} ${
-                    flag ? "bg-blue-200" : ""
-                  }`}
+                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8] ${themeObj} ${flag ? "bg-blue-200" : ""
+                    }`}
                 >
                   {!flag ? (
                     <TiTickOutline
@@ -238,13 +251,12 @@ export default function ExcelComponent() {
                         ) ? (
                           <div
                             key={valIndex}
-                            className={`w-[150px!important] text-start mx-2 overflow-hidden ${
-                              columnsHidden.includes(valIndex)
-                                ? "hidden"
-                                : "block"
-                            }`}
+                            className={`w-[150px!important] text-start mx-2 overflow-hidden ${columnsHidden.includes(valIndex)
+                              ? "hidden"
+                              : "block"
+                              }`}
                             onClick={() => {
-                              if(valIndex === 7) return;
+                              if (valIndex === 7) return;
                               setIsChanging({
                                 status: true,
                                 columnIndex: valIndex,
@@ -254,14 +266,14 @@ export default function ExcelComponent() {
                               });
                             }}
                           >
-                          {
-                            valIndex === 7 ?
-                            <a href={rowItem} target="_blank" rel="noreferrer" className="text-blue-500  p-2 underline-none bg-[#0330fc] text-white rounded-sm">Link</a>
-                            :
+                            {
+                              valIndex === 7 ?
+                                <a href={rowItem} target="_blank" rel="noreferrer" className="text-blue-500  p-2 underline-none bg-[#0330fc] text-white rounded-sm">Link</a>
+                                :
                                 rowItem.length > 10
-                                ? rowItem.slice(0, 10) + "..."
-                                : rowItem
-                              }
+                                  ? rowItem.slice(0, 10) + "..."
+                                  : rowItem
+                            }
                           </div>
                         ) : (
                           <input

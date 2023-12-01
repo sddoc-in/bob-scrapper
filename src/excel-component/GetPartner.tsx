@@ -1,10 +1,11 @@
-import cheerio from 'cheerio';
+//@ts-ignore
+import cheerio from 'cheerio'
 import { BASE_API_URL, corsProxy } from '../constant/data';
 
 export default async function GetNumberOfPartners(url: string) {
     try {
-        const response = await fetch(url);
-        // const response = await fetch(corsProxy + encodeURI(url));
+        // const response = await fetch(url);
+        const response = await fetch(corsProxy + encodeURI(url));
         const html = await response.text();
         const $ = cheerio.load(html);
         const numOfPartnersElement = $('.buy-block__alternative-sellers-card__title:contains("partners")');
