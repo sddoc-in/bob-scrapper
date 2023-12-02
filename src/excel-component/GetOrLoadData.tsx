@@ -144,7 +144,7 @@ export default function GetOrLoadData() {
                     className="btn btn-primary btn-active-shadow my-1 px-3 py-2 h-[auto] w-[auto] min-h-[auto] min-w-[auto"
                     onClick={loadMoreData}
                 >
-                    Load More
+                     Load More Pages
                 </button>
             </div>
 
