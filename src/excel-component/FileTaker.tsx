@@ -27,10 +27,10 @@ export default function FileTaker() {
         temp = fileData
       }
 
-      let i = 0
+      let i = 1
       setLoading(true);
 
-      for (i = 0; i < 4; i++) {
+      for (i = 1; i < 3; i++) {
         let response = await fetch(BASE_API_URL + new URLSearchParams({
           page: (currentPage + i).toString(),
           querry: currentProduct
@@ -48,7 +48,7 @@ export default function FileTaker() {
           // return
         }
         else {
-          if (i === 0) {
+          if (i === 1) {
             header = Object.keys(data[0])
             header.push("Partners")
           }

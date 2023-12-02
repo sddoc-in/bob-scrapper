@@ -38,12 +38,12 @@ export default function GetOrLoadData() {
             temp = fileData
         }
 
-        let i = 0
+        let i = 1
 
         setLoading(true);
         try {
 
-            for (i = 0; i < 4; i++) {
+            for (i = 1; i < 2; i++) {
                 let response = await fetch(BASE_API_URL + new URLSearchParams({
                     page: (currentPage + i).toString(),
                     querry: currentProduct
