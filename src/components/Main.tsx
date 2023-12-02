@@ -11,7 +11,7 @@ import { AiOutlineFileExcel } from "react-icons/ai";
 export default function Main() {
 
     const { setTheme, theme, themeObj } = React.useContext(MainContext)
-    const { downloadAsCsv, downloadAsExcel } = React.useContext(ExcelContext)
+    const { downloadAsCsv, downloadAsExcel, setState, setFileData, setHeader } = React.useContext(ExcelContext)
 
     function changeTheme() {
         if (theme === 'light') {
@@ -20,6 +20,12 @@ export default function Main() {
         else {
             setTheme('light')
         }
+    }
+
+    function newClicked (){
+        setState(0)
+        setFileData([])
+        setHeader([])
     }
 
 
@@ -45,9 +51,10 @@ export default function Main() {
                         <FileTaker />
                         :
                         <div style={{
-                            overflow:'hidden'
+                            overflow: 'hidden'
                         }}>
                             <div className="absolute right-0 top-2 flex items-center">
+                                <p onClick={newClicked} className='py-2 px-3 bg-blue-500 text-white mx-2 rounded-[10px] cursor-pointer'>New</p>
                                 <BsFiletypeCsv
                                     onClick={downloadAsCsv}
                                     className="text-[#000] text-[20px] mx-2 cursor-pointer"
