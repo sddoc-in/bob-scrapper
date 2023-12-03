@@ -1,13 +1,32 @@
+from fastapi import FastAPI, HTTPException, Query
 from bs4 import BeautifulSoup
-import requests, re, json, time
-from collections import OrderedDict
-from flask import Flask,request, jsonify
-from flask_cors import CORS
-app = Flask(__name__)
-cors = CORS(app, origins=["https://uibob.sddoc.in", "http://localhost:3000","http://localhost:3000/" ,"https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev", "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev"])
+from fastapi.responses import HTMLResponse  # Import JSONResponse  # Import HTMLResponse
+from fastapi.responses import JSONResponse
+import httpx , re , json , time, uvicorn
+import asyncio
+from fastapi.middleware.cors import CORSMiddleware
 
-@app.route('/')
-def index():
+app = FastAPI()
+
+
+origins = [
+    "https://uibob.sddoc.in",
+    "http://localhost:3000",
+    "http://localhost:3000/",
+    "https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev",
+    "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get('/', response_class=HTMLResponse)
+async def index():
     htmlindex = """
    <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +57,8 @@ def index():
 
     return htmlindex 
 
-def getdata(page,querry):
+
+async def getdata(page, querry):
     headers = {
         'authority': 'www.bol.com',
         'accept': 'application/json, text/plain, */*',
@@ -59,10 +79,10 @@ def getdata(page,querry):
         'searchtext': querry,
         'view': 'list',
         '_c': 'xhr',
-        # 'bltgc': 'oMbHe-J-BF28K2tWBahEpg',
     }
 
-    response = requests.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers)
 
     Soup = BeautifulSoup(response.text, 'html.parser')
     with open('bol.html', 'w', encoding='utf-8') as f:
@@ -71,26 +91,17 @@ def getdata(page,querry):
 
     product_details_list = []
     for data in ALLproduct:
-        productName= data.find('a', class_ = 'product-title px_list_page_product_click list_page_product_tracking_target')
+        productName = data.find('a', class_='product-title px_list_page_product_click list_page_product_tracking_target')
         try:
             productUrl = "https://www.bol.com/" + productName['href']
         except:
-            # print(productName)
             continue
-        # responsePartner= requests.get(productUrl)
-        # partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
-        # target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
-        # try:
-        #     NumOfpartners = target_div.text.strip()
-        # except:
-        #     NumOfpartners = "not have" # if there is no partners
-        # NumOfpartners = "not have" # if there is no partners/
         try:
-            originalPrice = data.find('del', class_= 'h-nowrap').text
+            originalPrice = data.find('del', class_='h-nowrap').text
         except:
-            originalPrice="it is already on original price"
-        
-        brandName = data.find('ul', class_= 'product-creator').text
+            originalPrice = "it is already on the original price"
+
+        brandName = data.find('ul', class_='product-creator').text
         star_rating_div = data.find('div', class_='star-rating')
         try:
             data_count_value = star_rating_div.get('data-count')
@@ -98,8 +109,8 @@ def getdata(page,querry):
             title_value = re.search(r'(\d+(?:,\d+)?)', title_value).group(1).replace(',', '.')
 
         except:
-            data_count_value=0
-            title_value= "no reviews"
+            data_count_value = '0'
+            title_value = "no reviews"
         pattern = re.compile(r'(.+)(?=Levertijd)', re.DOTALL)
         delvierybefore = data.find('div', class_="product-delivery")
         try:
@@ -107,18 +118,18 @@ def getdata(page,querry):
             match = pattern.search(delivery_time_text)
             delivery_time_text = match.group(1).strip()
         except:
-            delivery_time_text= "not have"
-        
+            delivery_time_text = "not have"
+
         try:
             price = data.find('span', class_='promo-price').text
             price = price.replace("\n", "").replace("  ", ".")
             if "-" in price:
-                price=price.replace("-", "").replace(".", "")
+                price = price.replace("-", "").replace(".", "")
         except:
             pass
-        brandName = brandName.replace("\n","")
+        brandName = brandName.replace("\n", "")
         try:
-            product_details ={
+            product_details = {
                 'Brand Name': brandName,
                 'Product Name': productName.text,
                 'Price': price,
@@ -134,25 +145,42 @@ def getdata(page,querry):
     return product_details_list
 
 
+async def getpartner(url):
+    # async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(transport=httpx.AsyncHTTPProxyTransport(url=f"http://109.236.88.38")) as client:
+        while True:
+            response = await client.get(url)
+            if response.status_code != 200:
+                await asyncio.sleep(delay=2)
+                continue
+            partnerSoup = BeautifulSoup(response.text, 'html.parser')
+            target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title',
+                                          string=lambda text: 'partners' in text.lower())
+            if target_div:
+                try:
+                    NumOfpartners = target_div.text.strip()
+                    return str(NumOfpartners)
 
-                
-        
+                except:
+                    NumOfpartners = '1'
+                    return str(NumOfpartners)
+
+@app.get('/getdata')
+async def home(page: int = Query(...), querry: str = Query(...)):
+    data = await getdata(page, querry)
+    return JSONResponse(data)
+
+@app.get('/getpartner')
+async def get_data(url: str = Query(...)):
+    if not url:
+        raise HTTPException(status_code=400, detail="Error: Missing 'url' parameter")
+    return await getpartner(url)
 
 
 
-@app.route('/getdata')
-def getdata1():
-    page = request.args.get('page')
-    querry = request.args.get('querry')
-    data = getdata(page,querry)
-    response = app.response_class(
-        response=json.dumps(data, sort_keys=False),
-        status=200,
-        mimetype='application/json'
-    )
-    
-    return response
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
-    # app.run(debug=True)
+    
+    uvicorn.run(app, host='0.0.0.0', port=80)
