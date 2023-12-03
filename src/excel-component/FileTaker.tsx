@@ -27,10 +27,10 @@ export default function FileTaker() {
         temp = fileData
       }
 
-      let i = 1
+      let i = 0
       setLoading(true);
 
-      for (i = 1; i < 3; i++) {
+      for (i = 0; i < 2; i++) {
         let response = await fetch(BASE_API_URL + new URLSearchParams({
           page: (currentPage + i).toString(),
           querry: currentProduct

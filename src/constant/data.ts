@@ -1,5 +1,5 @@
-// export const BASE_API_URL = "https://getapi-henna.vercel.app/getdata?";
-export const BASE_API_URL = "https://bob.sddoc.in/getdata?";
+export const BASE_API_URL = "https://getapi-henna.vercel.app/getdata?";
+// export const BASE_API_URL = "https://134.209.139.31:8000/getdata?";
 
 export const corsProxy = 'https://corsproxy.io/?';
 
