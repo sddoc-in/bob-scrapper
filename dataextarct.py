@@ -62,7 +62,7 @@ def getdata(page,querry):
         # 'bltgc': 'oMbHe-J-BF28K2tWBahEpg',
     }
 
-    response = requests.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers)
+    response = requests.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers, proxies={"http": "http://194.87.58.16:80"})
 
     Soup = BeautifulSoup(response.text, 'html.parser')
     with open('bol.html', 'w', encoding='utf-8') as f:
@@ -98,7 +98,7 @@ def getdata(page,querry):
             title_value = re.search(r'(\d+(?:,\d+)?)', title_value).group(1).replace(',', '.')
 
         except:
-            data_count_value='0'
+            data_count_value=0
             title_value= "no reviews"
         pattern = re.compile(r'(.+)(?=Levertijd)', re.DOTALL)
         delvierybefore = data.find('div', class_="product-delivery")
@@ -134,8 +134,28 @@ def getdata(page,querry):
     return product_details_list
 
 
+
+                
+def getpartner(url):
+    while True:
+        response = requests.get(url)
+        if response.status_code != 200:
+            time.sleep(5)
+            continue
+        partnerSoup = BeautifulSoup(response.text, 'html.parser')
+        target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title',
+                                        string=lambda text: 'partners' in text.lower())
+        if target_div:
+            try:
+                NumOfpartners = target_div.text.strip()
+                return str(NumOfpartners)
+
+            except:
+                NumOfpartners = '1'
+                return str(NumOfpartners)
+
 @app.route('/getdata')
-def getdata1():
+def getHome():
     page = request.args.get('page')
     querry = request.args.get('querry')
     data = getdata(page,querry)
@@ -146,6 +166,11 @@ def getdata1():
     )
     
     return response
+@app.route('/partner')
+def getPartner():
+    url = request.args.get('url')
+    data = getpartner(url)
+    return data
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)

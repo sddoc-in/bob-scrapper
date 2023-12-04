@@ -34,5 +34,6 @@ proxy =  response.json()
 
 import random
 
-randomProxy = random.choice(proxy['data'])['ip']
-print(randomProxy)
+randomProxy = random.choice(proxy['data'])
+url =  'http://'+randomProxy['ip']+ ':' + randomProxy['port']
+print(url)

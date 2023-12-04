@@ -170,11 +170,7 @@ async def home(page: int = Query(...), querry: str = Query(...)):
     data = await getdata(page, querry)
     return JSONResponse(data)
 
-@app.get('/getpartner')
-async def get_data(url: str = Query(...)):
-    if not url:
-        raise HTTPException(status_code=400, detail="Error: Missing 'url' parameter")
-    return await getpartner(url)
+
 
 
 
@@ -183,4 +179,4 @@ async def get_data(url: str = Query(...)):
 
 if __name__ == '__main__':
     
-    uvicorn.run(app, host='0.0.0.0', port=80)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
