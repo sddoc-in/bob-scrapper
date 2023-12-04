@@ -10,7 +10,6 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
-
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
@@ -18,4 +17,6 @@ EXPOSE 8000
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["gunicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["gunicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "main:app"]
+
