@@ -48,7 +48,7 @@ export default function FileTaker() {
           // return
         }
         else {
-          if (i === 1) {
+          if (i === 0) {
             header = Object.keys(data[0])
             header.push("Partners")
           }
