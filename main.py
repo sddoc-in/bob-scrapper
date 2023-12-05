@@ -4,7 +4,7 @@ from collections import OrderedDict
 from flask import Flask,request, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
-cors = CORS(app, origins=["https://uibob.sddoc.in", "http://localhost:3000","http://localhost:3000/" ,"https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev", "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev"])
+cors = CORS(app, origins=["https://uibob.sddoc.in","http://bol.bluechip-it.nl", "https://bol.bluechip-it.nl" ,"http://localhost:3000","http://localhost:3000/" ,"https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev", "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev"])
 
 @app.route('/')
 def index():
