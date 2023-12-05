@@ -3,6 +3,8 @@ import asyncio
 from bs4 import BeautifulSoup
 import re
 
+
+
 async def fetch(session, url, headers=None, params=None):
     async with session.get(url, headers=headers, params=params) as response:
         return await response.text()
@@ -12,18 +14,18 @@ async def get_product_details(session, product_url, headers):
     partner_soup = BeautifulSoup(response, 'html.parser')
     target_div = partner_soup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
     num_of_partners = target_div.text.strip() if target_div else "1"
+    num_of_partners = re.search(r'\b(\d+)\b', target_div.text.strip()).group(1) if target_div else "1"
     return num_of_partners
 
-async def get_data(urls, headers, params):
+async def get_data(urls, headers):
     async with aiohttp.ClientSession() as session:
-        tasks = [get_data_for_page(session, url,params,headers) for url in urls]
+        tasks = [get_data_for_page(session, url, headers) for url in urls]
         results = await asyncio.gather(*tasks)
-    return results
+    flattened_results = [item for sublist in results for item in sublist]
+    return flattened_results
 
-async def get_data_for_page(session,url,params,headers):
-    async with aiohttp.ClientSession() as session:
-        response = await fetch(session, url, headers=headers, params=params)
-
+async def get_data_for_page(session, url, headers):
+    response = await fetch(session, url, headers=headers)
     soup = BeautifulSoup(response, 'html.parser')
     all_product = soup.find_all('div', {'data-test': 'product-content'})
 
@@ -39,7 +41,7 @@ async def get_data_for_page(session,url,params,headers):
             continue
         product_url = "https://www.bol.com/" + product_name['href']
 
-        price = data.find('span', class_='promo-price').text.replace("\n", "").replace("  ", ".").replace("-","") if data.find('span', class_='promo-price') else None
+        price = data.find('span', class_='promo-price').text.replace('\n', '.', 1).replace('-', '') if data.find('span', class_='promo-price') else None
 
         try:
             original_price = data.find('del', class_='h-nowrap').text
@@ -75,7 +77,6 @@ async def get_data_for_page(session,url,params,headers):
 
     return product_details_list
 
-# Example usage:
 base_url = 'https://proxy.cors.sh/https://www.bol.com/nl/nl/s/'
 params = {'view': 'list', '_c': 'xhr'}
 headers = {
@@ -94,16 +95,9 @@ headers = {
     "x-cors-api-key": "live_a7f7c7a3bb2ac6518e0b2853f8616e85136068753c42ec10dde22af423ea68dc",
 }
 
-# loop = asyncio.get_event_loop()
-# result = loop.run_until_complete(get_data(url, params, headers))
-# print(result)
-# print(len(result))
-page_numbers = [1, 2, 3, 4]
+# Generate URLs for the pages you want to scrape
+page_numbers = [1,2,3,4]
 urls = [f"{base_url}?page={page}&searchtext=mobile" for page in page_numbers]
 
 loop = asyncio.get_event_loop()
-result = loop.run_until_complete(get_data(urls, headers, params))
-print(result)
-print(len(result))
-
-
+result = loop.run_until_complete(get_data(urls, headers))

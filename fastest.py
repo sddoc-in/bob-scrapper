@@ -14,13 +14,7 @@ async def get_product_details(session, product_url, headers):
     num_of_partners = target_div.text.strip() if target_div else "1"
     return num_of_partners
 
-async def get_data(urls, headers, params):
-    async with aiohttp.ClientSession() as session:
-        tasks = [get_data_for_page(session, url,params,headers) for url in urls]
-        results = await asyncio.gather(*tasks)
-    return results
-
-async def get_data_for_page(session,url,params,headers):
+async def get_data(url, params, headers):
     async with aiohttp.ClientSession() as session:
         response = await fetch(session, url, headers=headers, params=params)
 
@@ -35,8 +29,6 @@ async def get_data_for_page(session,url,params,headers):
 
     for index, data in enumerate(all_product):
         product_name = data.find('a', class_='product-title px_list_page_product_click list_page_product_tracking_target')
-        if product_name is None:
-            continue
         product_url = "https://www.bol.com/" + product_name['href']
 
         price = data.find('span', class_='promo-price').text.replace("\n", "").replace("  ", ".").replace("-","") if data.find('span', class_='promo-price') else None
@@ -76,8 +68,8 @@ async def get_data_for_page(session,url,params,headers):
     return product_details_list
 
 # Example usage:
-base_url = 'https://proxy.cors.sh/https://www.bol.com/nl/nl/s/'
-params = {'view': 'list', '_c': 'xhr'}
+url = 'https://proxy.cors.sh/https://www.bol.com/nl/nl/s/'
+params = {'page': "1", 'searchtext': "mobile", 'view': 'list', '_c': 'xhr'}
 headers = {
     'authority': 'www.bol.com',
     'accept': 'application/json, text/plain, */*',
@@ -94,16 +86,7 @@ headers = {
     "x-cors-api-key": "live_a7f7c7a3bb2ac6518e0b2853f8616e85136068753c42ec10dde22af423ea68dc",
 }
 
-# loop = asyncio.get_event_loop()
-# result = loop.run_until_complete(get_data(url, params, headers))
-# print(result)
-# print(len(result))
-page_numbers = [1, 2, 3, 4]
-urls = [f"{base_url}?page={page}&searchtext=mobile" for page in page_numbers]
-
 loop = asyncio.get_event_loop()
-result = loop.run_until_complete(get_data(urls, headers, params))
+result = loop.run_until_complete(get_data(url, params, headers))
 print(result)
 print(len(result))
-
-
