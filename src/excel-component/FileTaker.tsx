@@ -6,14 +6,26 @@ import { BASE_API_URL, PRODUCT_URL } from "../constant/data";
 import GetNumberOfPartners from "./GetPartner";
 
 export default function FileTaker() {
+  const { setHeader, setFileData, fileChoser, fileData } =
+    React.useContext(ExcelContext);
 
+  const {
+    setLoading,
+    setState,
+    setCurrentProduct,
+    allProducts,
+    setAllProducts,
+    currentProduct,
+    currentPage,
+    setCurrentPage,
+    oppositeObj,
+    loopBreaker,
+    setCurrentRequest,
+    // setLoopBreaker,
+    setMaxState
+  } = React.useContext(MainContext);
 
-  const { setHeader, setFileData, setState, fileChoser, fileData } = React.useContext(ExcelContext);
-
-
-  const { setLoading, setCurrentProduct, allProducts, setAllProducts, currentProduct, currentPage, setCurrentPage, themeObj, oppositeObj } = React.useContext(MainContext);
-
-  const getQueryData = React.useRef(() => { });
+  const getQueryData = React.useRef(() => {});
 
   getQueryData.current = async () => {
     try {
@@ -21,58 +33,67 @@ export default function FileTaker() {
         alert("Enter Product");
         return;
       }
-      let temp: any = []
-      let header: any = []
+      let temp: any = [];
+      let header: any = [];
       if (fileData.length > 0) {
-        temp = fileData
+        temp = fileData;
       }
 
-      let i = 0
+      let i = 0;
       setLoading(true);
-
+      setMaxState(57);
       for (i = 0; i < 2; i++) {
-        let response = await fetch(BASE_API_URL + new URLSearchParams({
-          page: (currentPage + i).toString(),
-          querry: currentProduct
-        }), {
-          method: "GET",
-          headers: {
-            "Access-Control-Allow-Methods": '*',
-            "Access-Control-Allow-Headers": '*',
-            "Access-Control-Allow-Origin": '*',
-          },
-        });
+        // if (loopBreaker) break;
+        let response = await fetch(
+          BASE_API_URL +
+            new URLSearchParams({
+              page: (currentPage + i).toString(),
+              querry: currentProduct,
+            }),
+          {
+            method: "GET",
+            headers: {
+              "Access-Control-Allow-Methods": "*",
+              "Access-Control-Allow-Headers": "*",
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
         let data = await response.json();
         if (data.length === 0) {
           // alert("No Data Found")
           // return
-        }
-        else {
+        } else {
           if (i === 0) {
-            header = Object.keys(data[0])
-            header.push("Partners")
+            header = Object.keys(data[0]);
+            header.push("Partners");
           }
           for (let j = 0; j < data.length; j++) {
-            let tempObj: any = Object.values(data[j])
-            let partner = await GetNumberOfPartners(tempObj[PRODUCT_URL])
-            tempObj.push(partner)
-            temp.push(tempObj)
+            // if (loopBreaker) setState(1);
+            let tempObj: any = Object.values(data[j]);
+            let partner = await GetNumberOfPartners(tempObj[PRODUCT_URL]);
+            tempObj.push(partner);
+            temp.push(tempObj);
+            setCurrentRequest((prev) => prev + 1);
           }
         }
       }
-      setHeader(header)
-      setFileData(temp)
-      setAllProducts([...allProducts, { product: currentProduct, page: currentPage + i }])
+      setHeader(header);
+      setFileData(temp);
+      // setLoopBreaker(false);
+      setAllProducts([
+        ...allProducts,
+        { product: currentProduct, page: currentPage + i },
+      ]);
       setCurrentPage(currentPage + i);
-      setState(1)
-
-    }
-    catch (e) {
-      console.log(e)
-      alert("Something went wrong")
+      setState(1);
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong");
     }
     setLoading(false);
-
+    setCurrentRequest(0);
+    setMaxState(0)
   };
 
   function checkFileTypes(file: string) {
@@ -86,7 +107,6 @@ export default function FileTaker() {
       "application/vnd.ms-excel.template.macroEnabled.12",
       "application/vnd.ms-excel.addin.macroEnabled.12",
       "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
-
     ];
     if (types.includes(file)) {
       return true;
@@ -98,14 +118,18 @@ export default function FileTaker() {
       alert("Only Excel and csv files are allowed");
       return;
     }
-    fileChoser(file)
+    fileChoser(file);
   }
 
   return (
     <>
       <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
-
-        <input type="text" className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`} placeholder="Enter Product" onChange={(e) => setCurrentProduct(e.target.value)} />
+        <input
+          type="text"
+          className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`}
+          placeholder="Enter Product"
+          onChange={(e) => setCurrentProduct(e.target.value)}
+        />
 
         <div className="flex justify-center items-center">
           <button
@@ -116,7 +140,7 @@ export default function FileTaker() {
           </button>
         </div>
 
-        <div className="divider w-full" >OR</div>
+        <div className="divider w-full">OR</div>
         <input
           type="file"
           className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white ${oppositeObj}`}

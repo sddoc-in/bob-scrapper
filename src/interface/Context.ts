@@ -21,6 +21,15 @@ export default interface HappyClientMainContextInterface {
     setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
     currentProduct: string,
     setCurrentProduct: React.Dispatch<React.SetStateAction<string>>,
+    currentRequest:number,
+    setCurrentRequest:React.Dispatch<React.SetStateAction<number>>,
+    CancelRequests:()=>void,
+    loopBreaker:boolean,
+    setLoopBreaker:React.Dispatch<React.SetStateAction<boolean>>,
+    state:number,
+    setState:React.Dispatch<React.SetStateAction<number>>,
+    maxState:number,
+    setMaxState:React.Dispatch<React.SetStateAction<number>>,
 }
 
 

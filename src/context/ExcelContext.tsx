@@ -14,9 +14,8 @@ export const ExcelContext = React.createContext<ExcelContextInterface>(
 
 export default function ExcelProvider({ children }: any) {
 
-  const {setLoading} = React.useContext(MainContext);
+  const {setLoading,setState} = React.useContext(MainContext);
 
-  const [state, setState] = React.useState<number>(0);
   const [url, setUrl] = React.useState<string>("");
 
   const [fileData, setFileData] = React.useState<any>({});
@@ -196,8 +195,6 @@ export default function ExcelProvider({ children }: any) {
   return (
     <ExcelContext.Provider
       value={{
-        state,
-        setState,
         fileChoser,
         fileData,
         setFileData,

@@ -1,6 +1,4 @@
 interface ExcelContextInterface {
-    state: number;
-    setState: React.Dispatch<React.SetStateAction<number>>;
     fileChoser: (e: any) => void;
     onlineFileChoser: (file: any) => void;
     fileData: any;

@@ -10,7 +10,7 @@ import GetNumberOfPartners from './GetPartner';
 
 
 export default function GetOrLoadData() {
-    const { allProducts, setAllProducts, setCurrentProduct, setCurrentPage, themeObj, oppositeObj, setLoading } = React.useContext(MainContext)
+    const { allProducts, setAllProducts, setCurrentProduct, setCurrentPage, themeObj, oppositeObj, setLoading,setCurrentRequest,setMaxState } = React.useContext(MainContext)
     const { fileData, setFileData } = React.useContext(ExcelContext)
     const [selectedProduct, setSelectedProduct] = React.useState<any>({})
     const [newProduct, setNewProduct] = React.useState<string>('')
@@ -39,7 +39,7 @@ export default function GetOrLoadData() {
         }
 
         let i = 1
-
+        setMaxState(27)
         setLoading(true);
         try {
 
@@ -66,6 +66,7 @@ export default function GetOrLoadData() {
                         let partner = await GetNumberOfPartners(tempObj[7])
                         tempObj.push(partner)
                         temp.push(tempObj)
+                        setCurrentRequest((prev)=>prev+1)
                     }
                 }
             }
@@ -80,7 +81,6 @@ export default function GetOrLoadData() {
                     return item
                 })
             }
-
             setFileData(temp)
             setAllProducts(newProductList)
             setSelectOpen({ open: false })
@@ -95,6 +95,9 @@ export default function GetOrLoadData() {
         }
 
         setLoading(false);
+        
+        setMaxState(0)
+        setCurrentPage(currentPage + i)
     }
 
     return (
