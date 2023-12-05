@@ -52,6 +52,7 @@ def getdata(page,querry):
         'sec-fetch-site': 'same-origin',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
         'x-requested-with': 'xhr',
+        "x-cors-api-key": "live_a7f7c7a3bb2ac6518e0b2853f8616e85136068753c42ec10dde22af423ea68dc",
     }
 
     params = {
@@ -62,7 +63,7 @@ def getdata(page,querry):
         # 'bltgc': 'oMbHe-J-BF28K2tWBahEpg',
     }
 
-    response = requests.get('https://www.bol.com/nl/nl/s/', params=params, headers=headers)
+    response = requests.get('https://proxy.cors.sh/https://www.bol.com/nl/nl/s/', params=params, headers=headers)
 
     Soup = BeautifulSoup(response.text, 'html.parser')
     with open('bol.html', 'w', encoding='utf-8') as f:
@@ -73,17 +74,17 @@ def getdata(page,querry):
     for data in ALLproduct:
         productName= data.find('a', class_ = 'product-title px_list_page_product_click list_page_product_tracking_target')
         try:
-            productUrl = "https://www.bol.com/" + productName['href']
+            productUrl = "https://proxy.cors.sh/https://www.bol.com/" + productName['href']
         except:
             # print(productName)
             continue
-        # responsePartner= requests.get(productUrl)
-        # partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
-        # target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
-        # try:
-        #     NumOfpartners = target_div.text.strip()
-        # except:
-        #     NumOfpartners = "not have" # if there is no partners
+        responsePartner= requests.get(productUrl, headers=headers)
+        partnerSoup = BeautifulSoup(responsePartner.text, 'html.parser')
+        target_div = partnerSoup.find('div', class_='buy-block__alternative-sellers-card__title', string=lambda text: 'partners' in text.lower())
+        try:
+            NumOfpartners = target_div.text.strip()
+        except:
+            NumOfpartners = "1" # if there is no partners
         # NumOfpartners = "not have" # if there is no partners/
         try:
             originalPrice = data.find('del', class_= 'h-nowrap').text
@@ -127,6 +128,7 @@ def getdata(page,querry):
                 'Delivery Time': delivery_time_text,
                 'Real Price': originalPrice,
                 'Product Url': productUrl,
+                'Partners': NumOfpartners
             }
             product_details_list.append(product_details)
         except:
