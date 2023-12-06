@@ -14,6 +14,8 @@ origins = [
     "https://uibob.sddoc.in",
     "http://localhost:3000",
     "http://localhost:3000/",
+    "http://bol.bluechip-it.nl", 
+    "https://bol.bluechip-it.nl"
     "https://improved-yodel-jw6rgqjg4gv35r79-3000.app.github.dev",
     "https://glorious-space-dollop-rq964wvjrpq356pq-3000.app.github.dev",
 ]
