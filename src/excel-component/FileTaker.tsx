@@ -41,13 +41,14 @@ export default function FileTaker() {
 
       let i = 0;
       setLoading(true);
-      setMaxState(57);
-      for (i = 0; i < 2; i++) {
+      // setMaxState(57);
+      for (i = 0; i < 1; i++) {
         // if (loopBreaker) break;
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
-              page: (currentPage + i).toString(),
+              minpage: (currentPage + i).toString(),
+              maxpage: (currentPage + i+3).toString(),
               querry: currentProduct,
             }),
           {
@@ -66,13 +67,13 @@ export default function FileTaker() {
         } else {
           if (i === 0) {
             header = Object.keys(data[0]);
-            header.push("Partners");
+           // header.push("Partners");
           }
           for (let j = 0; j < data.length; j++) {
             // if (loopBreaker) setState(1);
             let tempObj: any = Object.values(data[j]);
-            let partner = await GetNumberOfPartners(tempObj[PRODUCT_URL]);
-            tempObj.push(partner);
+            // let partner = await GetNumberOfPartners(tempObj[PRODUCT_URL]);
+            // tempObj.push(partner);
             temp.push(tempObj);
             setCurrentRequest((prev) => prev + 1);
           }
@@ -83,17 +84,18 @@ export default function FileTaker() {
       // setLoopBreaker(false);
       setAllProducts([
         ...allProducts,
-        { product: currentProduct, page: currentPage + i },
+        { product: currentProduct, page: currentPage +3
+         },
       ]);
-      setCurrentPage(currentPage + i);
+      setCurrentPage(currentPage +3);
       setState(1);
     } catch (e) {
       console.log(e);
       alert("Something went wrong");
     }
     setLoading(false);
-    setCurrentRequest(0);
-    setMaxState(0)
+    // setCurrentRequest(0);
+    // setMaxState(0)
   };
 
   function checkFileTypes(file: string) {
